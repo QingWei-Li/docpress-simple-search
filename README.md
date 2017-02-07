@@ -1,4 +1,4 @@
-# docpress-search
+# docpress-simple-search
 
 Search plugin for [docpress].
 

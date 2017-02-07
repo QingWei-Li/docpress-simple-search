@@ -40,10 +40,7 @@ function updateIndex (files, ms, done) {
   })
 
   extendIndex(files['_docpress.json'], (file) => {
-    file.searchIndex = idx
-    file.lunrIndex = memoize([ 'lunr', ms.directory(), idx ], () => {
-      return JSON.stringify(lunrize(idx))
-    })
+    file.searchIndex = Object.keys(idx).map(key => idx[key]);
   })
 
   done()
@@ -59,9 +56,6 @@ function addJs (files, ms, done) {
     contents =
       'window.__searchindex=(' +
       JSON.stringify(files['_docpress.json'].searchIndex, null, 2) +
-      ');\n' +
-      'window.__lunrindex=(' +
-      files['_docpress.json'].lunrIndex +
       ');\n' + contents
     files['assets/search.js'] = { contents }
     done()
@@ -82,25 +76,6 @@ function addMeta (files, ms, done) {
     meta.js.push('assets/search.js')
   }
   done()
-}
-
-/*
- * Internal: turns the index into a lunr object
- */
-
-function lunrize (idx) {
-  const lunr = require('lunr')
-  const index = lunr(function () {
-    this.field('title', { boost: 10 })
-    // todo: boost if heading
-    this.field('pagetitle', { boost: 3 })
-    this.field('body')
-    this.ref('slug')
-  })
-  Object.keys(idx).forEach((slug) => {
-    index.add(idx[slug])
-  })
-  return index
 }
 
 /**
