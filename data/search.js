@@ -1,64 +1,12 @@
-function initSearch() {
-  var BODY = document.body
-  console.log(333)
-  var form = document.querySelector('.search-form')
-  var inputElements = document.querySelectorAll('.search-input')
+// From [weex website] https://weex-project.io/js/common.js
 
-  BODY.addEventListener('click', function (e) {
-    var target = e.target,
-        resultsPanel = document.querySelectorAll('.results-panel.show')
-
-    Array.prototype.forEach.call(resultsPanel, function (item, index) {
-      if (!item.contains(target)) {
-        item.classList.remove('show')
-      }
-    })
-  })
-
-  var root = '/'
-
-  Array.prototype.forEach.call(inputElements, function (input, index) {
-    input.addEventListener('input', function (e) {
-      var target = e.target,
-          panel = target.parentElement && target.parentElement.nextElementSibling,
-          keywords = target.value.trim().split(/[\s\-\，\\/]+/)
-
-      if (target.value.trim() !== '') {
-        console.log(keywords)
-        var matchingPosts = searchFromJSON(window.__searchindex, keywords)
-        var html = ''
-
-        console.log(matchingPosts)
-        matchingPosts.forEach(function (post, index) {
-          var url = root + post.slug
-          var htmlSnippet = '<div class=\"matching-post\">' +
-                              '<h2>' +
-                                '<a href=\"' + url + '\">' + post.title + '</a>' +
-                              '</h2>' +
-                              '<p>' + post.body + '</p>' +
-                            '</div>'
-
-          html += htmlSnippet
-        })
-        if (panel.classList.contains('results-panel')) {
-          panel.classList.add('show')
-          panel.innerHTML = html ? html : '<p>No Results!</p>'
-        }
-      } else {
-        if (panel.classList.contains('results-panel')) {
-          panel.classList.remove('show')
-          panel.innerHTML = ''
-        }
-      }
-    })
-  })
-}
-
-function searchFromJSON (data, keywords) {
+window.Search = function (keywords) {
   var matchingResults = []
+  var data = window.__searchindex
+
+  keywords = keywords.trim().split(/[\s\-\，\\/]+/)
 
   for (var i = 0; i < data.length; i++) {
-
     var post = data[i]
     var isMatch = false
     var postTitle = post.title && post.title.trim(),
@@ -117,9 +65,6 @@ function searchFromJSON (data, keywords) {
       }
     }
   }
-  // matchingResults.sort(function (a, b) {
-  //   return a.matchingNum > b.matchingNum
-  // })
 
   return matchingResults
 }
@@ -138,5 +83,3 @@ function escapeHtml(string) {
     return entityMap[s];
   })
 }
-
-window.onload = initSearch
